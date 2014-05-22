@@ -126,3 +126,14 @@ Example:
 ExitCode:
 * 0 means ok
 * non-0 means err. returns E_FAIL.
+
+
+### Registry example
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf]
+@="\"C:\\Program Files (x86)\\ThumbGensPack\\pdf2bmp2.exe\" \"%1!s!\" \"%2!s!\" \"%3!u!\" \"%4!u!\" \"%5!u!\""
+"MP"="\"C:\\Program Files (x86)\\ThumbGensPack\\pdf2bmp2.exe\" \"%1!s!\" \"%2!s!\" \"%3!u!\" \"%4!u!\" \"%5!u!\" \"%6!u!\""
+"GPC"="\"C:\\Program Files (x86)\\ThumbGensPack\\pdfpcnt.exe\" \"%1!s!\" \"%2!s!\""
+```
