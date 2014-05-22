@@ -120,6 +120,7 @@ Example:
 
 %2
 * output file path (is a temp file path)
+* GPC tool leaves page count. Gene reads it by [_ttoi](http://msdn.microsoft.com/en-us/library/yd5xkb5c.aspx).
 
 
 ExitCode:
