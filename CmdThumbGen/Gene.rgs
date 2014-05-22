@@ -1,0 +1,26 @@
+HKCR
+{
+	CmdThumbGen.Gene.1 = s 'Gene Class'
+	{
+		CLSID = s '{93FB1A02-084D-43B4-A69F-65D8B86F2AB3}'
+	}
+	CmdThumbGen.Gene = s 'Gene Class'
+	{
+		CLSID = s '{93FB1A02-084D-43B4-A69F-65D8B86F2AB3}'
+		CurVer = s 'CmdThumbGen.Gene.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {93FB1A02-084D-43B4-A69F-65D8B86F2AB3} = s 'Gene Class'
+		{
+			ProgID = s 'CmdThumbGen.Gene.1'
+			VersionIndependentProgID = s 'CmdThumbGen.Gene'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Free'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{7DF507D7-46CD-43FF-A591-4CB7E9D5BE63}'
+		}
+	}
+}
