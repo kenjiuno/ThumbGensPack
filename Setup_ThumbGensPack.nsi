@@ -11,13 +11,16 @@
 !define TTL "ThumbGensPack ${__TIMESTAMP__}"
 !define COM "HIRAOKA HYPERS TOOLS, Inc."
 
-!define VER "1.2.11"
+!define VER "1.2.12"
 
 !define CLSID "{93FB1A02-084D-43B4-A69F-65d8b86f2ab3}"
 
 !define IID_IExtractImage "{BB2E617C-0920-11d1-9A0B-00C04FC2D6C1}"
 !define IID_IThumbnailProvider "{e357fccd-a995-4576-b01f-234630154e96}"
 !define IID_ISetPage4ThumbnailProvider "{d8d5f848-8223-42fc-bbcb-c40056b71a17}"
+
+!define EPKey1 "{db1447dd-b517-4bab-962f-0f6c472cac35}"
+!define EPKey2 "{1fcbd4d2-83e3-4b3d-8400-f0baf8969bb8}"
 
 ; The name of the installer
 Name "${APP} ${VER}"
@@ -32,15 +35,19 @@ InstallDir "$PROGRAMFILES\${APP}"
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\${COM}\${APP}" "Install_Dir"
 
+;SetCompress off
+
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
 !define DOTNET_VERSION "2.0"
 
 !include "DotNET.nsh"
-!include LogicLib.nsh
+!include "LogicLib.nsh"
 
 !include "Registry.nsh"
+
+!include "x64.nsh"
 
 ;--------------------------------
 
@@ -162,14 +169,26 @@ SectionGroup "PDF対応"
     File ".\pdfpcnt\bin\Release\pdfpcnt.pdb"
     File ".\pdfpcnt\pdfinfo.exe"
 
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" ""    '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!"'
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "MP"  '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!" "%6!u!"'
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "GPC" '"$INSTDIR\pdfpcnt.exe" "%1!s!" "%2!s!"'
-    SetRegView 64
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" ""    '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!"'
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "MP"  '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!" "%6!u!"'
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "GPC" '"$INSTDIR\pdfpcnt.exe" "%1!s!" "%2!s!"'
-    SetRegView lastused
+    ${If} 32 < 8086
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" ""    '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!"'
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "MP"  '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!" "%6!u!"'
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "GPC" '"$INSTDIR\pdfpcnt.exe" "%1!s!" "%2!s!"'
+      
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppName" "pdf2bmp2.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "Policy" 1
+    ${EndIf}
+    ${If} ${RunningX64}
+      SetRegView 64
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" ""    '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!"'
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "MP"  '"$INSTDIR\pdf2bmp2.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!" "%5!u!" "%6!u!"'
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.pdf" "GPC" '"$INSTDIR\pdfpcnt.exe" "%1!s!" "%2!s!"'
+
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppName" "pdf2bmp2.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "Policy" 1
+      SetRegView lastused
+    ${EndIf}
 
     SetOutPath "$INSTDIR\share"
     File /r /x ".svn" "share\*.*"
@@ -199,10 +218,22 @@ SectionGroup "JNT対応 (Windows Journal Viewer 1.5 対応)"
     File "..\Jnt2bmp\bin\x86\DEBUG\AxInterop.NbDocViewerLib.dll"
     File "..\Jnt2bmp\bin\x86\DEBUG\Interop.NbDocViewerLib.dll"
 
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.jnt" "" '"$INSTDIR\Jnt2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
-    SetRegView 64
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.jnt" "" '"$INSTDIR\Jnt2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
-    SetRegView lastused
+    ${If} 32 < 8086
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.jnt" "" '"$INSTDIR\Jnt2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "AppName" "Jnt2bmp.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "Policy" 1
+    ${EndIf}
+    ${If} ${RunningX64}
+      SetRegView 64
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.jnt" "" '"$INSTDIR\Jnt2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "AppName" "Jnt2bmp.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}" "Policy" 1
+      SetRegView lastused
+    ${EndIf}
   SectionEnd
   ; - - - Section - - -
   Section /o ".JNT 拡張子へ 関連付け"
@@ -226,11 +257,15 @@ SectionGroup "DXF対応"
     File ".\dxf2bmp\bin\Release\dxf2bmp.pdb"
     File ".\dxf2bmp\bin\Release\dxf2bmp.exe"
 
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.dxf" "" '"$INSTDIR\dxf2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
-    SetRegView 64
-    WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.dxf" "" '"$INSTDIR\dxf2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
-    SetRegView lastused
-    
+    ${If} 32 < 8086
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.dxf" "" '"$INSTDIR\dxf2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+    ${EndIf}
+    ${If} ${RunningX64}
+      SetRegView 64
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.dxf" "" '"$INSTDIR\dxf2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+      SetRegView lastused
+    ${EndIf}
+
     IfFileExists "$WINDIR\Microsoft.NET\Framework\v3.5\*.*" Avail
       MessageBox MB_ICONEXCLAMATION "dxf2bmpを実行するには.NET Framework 3.5が必要です。$\n$\n検出されなかったようなので、警告いたします。"
     Avail:
@@ -308,7 +343,7 @@ Section "Uninstall"
   Delete "$INSTDIR\pdfpcnt.exe"
   Delete "$INSTDIR\pdfpcnt.pdb"
   Delete "$INSTDIR\pdfinfo.exe"
-
+  
   Delete "$INSTDIR\dxf2bmp.exe"
   Delete "$INSTDIR\dxf2bmp.pdb"
 
@@ -316,6 +351,17 @@ Section "Uninstall"
   Delete "$INSTDIR\Jnt2bmp.pdb"
   Delete "$INSTDIR\AxInterop.NbDocViewerLib.dll"
   Delete "$INSTDIR\Interop.NbDocViewerLib.dll"
+
+  ${If} 32 < 8086
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}"
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}"
+  ${EndIf}
+  ${If} ${RunningX64}
+    SetRegView 64
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}"
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey2}"
+    SetRegView lastused
+  ${EndIf}
 
   ExecWait 'REGSVR32 /s /u "$INSTDIR\CmdThumbGen.dll"' $0
   DetailPrint "結果: $0"
