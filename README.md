@@ -41,10 +41,18 @@ idl definition:
 	};
 ```
 
+iPage of SetActivePage:
+- Set 0 to call (Default) generator.
+- Set non zero such as 1,2 or 3 to call "MP" generator.
+
 Thumbnail generators
 --------------------
 
-thumbnail generation is done by command line programs.
+The thumbnail generator extracts a thumbnail image from a document like TIF/PDF.
+
+It is done by command line converter programs.
+
+Add the registry value in order to install it.
 
 ### Registry key path
 ```
@@ -64,9 +72,13 @@ GPC
 ```
 
 #### (Default) and MP
+Specify a command line thumbnail generator.
+
+It extracts a single page thumbnail from your document.
+
 Description: 
-* __(Default)__ is for single page extraction
-* __MP__ is for multi page extraction
+* The registry value __(Default)__ is for **single** page document like JPG/PNG.
+* The registry value __MP__ is for **multi** page document like TIF/PDF, if it is supported.
 
 
 Example: 
