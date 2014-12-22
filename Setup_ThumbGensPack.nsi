@@ -11,7 +11,7 @@
 !define TTL "ThumbGensPack ${__TIMESTAMP__}"
 !define COM "HIRAOKA HYPERS TOOLS, Inc."
 
-!define VER "1.2.12"
+!define VER "1.2.13"
 
 !define CLSID "{93FB1A02-084D-43B4-A69F-65d8b86f2ab3}"
 
@@ -48,6 +48,8 @@ RequestExecutionLevel admin
 !include "Registry.nsh"
 
 !include "x64.nsh"
+
+!include "WordFunc.nsh"
 
 ;--------------------------------
 
@@ -139,6 +141,11 @@ SectionEnd
     StrCpy $0 "${EXT}"
 
     ReadRegStr $1 HKCR "$0" ""
+    ${If} $1 == ''
+      ${WordReplace} "$0file" "." "" "+" $1
+      WriteRegStr HKCR "$0" "" "$1"
+      WriteRegStr HKCR "$1" "DUMMY" ""
+    ${EndIf}
     ${If} $1 != ''
       ReadRegStr $2 HKCR "$1\CurVer" ""
       ${If} $2 != ''
@@ -206,6 +213,47 @@ SectionGroupEnd
 
 
 
+SectionGroup "BPG対応"
+  ; - - - Section - - -
+  Section "bpg2bmp,bpgdec一式"
+    ; Set output path to the installation directory.
+    SetOutPath $INSTDIR
+
+    ; Put file there
+    File ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe"
+    File ".\bpg2bmp\bin\DEBUG\bpg2bmp.pdb"
+    File ".\bpg2bmp\bpgdec.exe"
+
+    ${If} 32 < 8086
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.bpg" ""    '"$INSTDIR\bpg2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppName" "bpg2bmp.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "Policy" 1
+    ${EndIf}
+    ${If} ${RunningX64}
+      SetRegView 64
+      WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.bpg" ""    '"$INSTDIR\bpg2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
+
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppName" "bpg2bmp.exe"
+      WriteRegStr   HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "AppPath" "$INSTDIR"
+      WriteRegDWord HKLM "SOFTWARE\Microsoft\Internet Explorer\Low Rights\ElevationPolicy\${EPKey1}" "Policy" 1
+      SetRegView lastused
+    ${EndIf}
+
+  SectionEnd
+  ; - - - Section - - -
+  Section ".BPG 拡張子へ 関連付け"
+    !insertmacro SetExtAssoc ".bpg"
+  SectionEnd
+  ; - - - Section - - -
+  Section ".BPG アプリへ 関連付け"
+    !insertmacro SetProgidAssoc ".bpg"
+  SectionEnd
+SectionGroupEnd
+
+
+
 SectionGroup "JNT対応 (Windows Journal Viewer 1.5 対応)"
   ; - - - Section - - -
   Section /o "Jnt2bmp一式"
@@ -213,10 +261,10 @@ SectionGroup "JNT対応 (Windows Journal Viewer 1.5 対応)"
     SetOutPath $INSTDIR
 
     ; Put file there
-    File "..\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe"
-    File "..\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.pdb"
-    File "..\Jnt2bmp\bin\x86\DEBUG\AxInterop.NbDocViewerLib.dll"
-    File "..\Jnt2bmp\bin\x86\DEBUG\Interop.NbDocViewerLib.dll"
+    File ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe"
+    File ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.pdb"
+    File ".\Jnt2bmp\bin\x86\DEBUG\AxInterop.NbDocViewerLib.dll"
+    File ".\Jnt2bmp\bin\x86\DEBUG\Interop.NbDocViewerLib.dll"
 
     ${If} 32 < 8086
       WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.jnt" "" '"$INSTDIR\Jnt2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
@@ -287,6 +335,13 @@ Section /o "ソースコード入手"
   SetOutPath "$INSTDIR\src"
   File /r /x ".svn" "src\*.*"
 SectionEnd
+
+
+Section "Refresh Desktop"
+  ; http://nsis.sourceforge.net/Refresh_Desktop
+  System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
+SectionEnd
+
 
 Function .onInit
 ;  ReadRegStr $0 HKCR "CLSID\{03A421AD-E8EE-4c47-9A03-FB386747186B}\InprocServer32" ""
