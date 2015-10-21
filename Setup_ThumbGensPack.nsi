@@ -157,7 +157,7 @@ SectionEnd
 
       WriteRegStr HKCR "$1\ShellEx\${IID_IExtractImage}" "" "${CLSID}"
       WriteRegStr HKCR "$1\ShellEx\${IID_IThumbnailProvider}" "" "${CLSID}"
-      WriteRegStr HKCR "$0\ShellEx\${IID_ISetPage4ThumbnailProvider}" "" "${CLSID}"
+      WriteRegStr HKCR "$1\ShellEx\${IID_ISetPage4ThumbnailProvider}" "" "${CLSID}"
     ${EndIf}
 !macroend
 
@@ -364,6 +364,7 @@ FunctionEnd
 
   DeleteRegValue HKCR "$0\ShellEx\${IID_IExtractImage}" ""
   DeleteRegValue HKCR "$0\ShellEx\${IID_IThumbnailProvider}" ""
+  DeleteRegValue HKCR "$0\ShellEx\${IID_ISetPage4ThumbnailProvider}" ""
 
   ${registry::MoveValue} "HKCR\$0\ShellEx\${IID_IExtractImage}"      "Backup" "HKCR\$0\ShellEx\${IID_IExtractImage}"      "" $2
   ${registry::MoveValue} "HKCR\$0\ShellEx\${IID_IThumbnailProvider}" "Backup" "HKCR\$0\ShellEx\${IID_IThumbnailProvider}" "" $2
@@ -379,6 +380,7 @@ FunctionEnd
 
     DeleteRegValue HKCR "$1\ShellEx\${IID_IExtractImage}" ""
     DeleteRegValue HKCR "$1\ShellEx\${IID_IThumbnailProvider}" ""
+    DeleteRegValue HKCR "$1\ShellEx\${IID_ISetPage4ThumbnailProvider}" ""
 
     ${registry::MoveValue} "HKCR\$1\ShellEx\${IID_IExtractImage}"      "Backup" "HKCR\$1\ShellEx\${IID_IExtractImage}"      "" $2
     ${registry::MoveValue} "HKCR\$1\ShellEx\${IID_IThumbnailProvider}" "Backup" "HKCR\$1\ShellEx\${IID_IThumbnailProvider}" "" $2
