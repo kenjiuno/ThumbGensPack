@@ -11,7 +11,7 @@
 !define TTL "ThumbGensPack ${__TIMESTAMP__}"
 !define COM "HIRAOKA HYPERS TOOLS, Inc."
 
-!define VER "1.2.13"
+!define VER "1.2.14"
 
 !define CLSID "{93FB1A02-084D-43B4-A69F-65d8b86f2ab3}"
 

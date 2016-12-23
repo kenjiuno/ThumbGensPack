@@ -166,25 +166,23 @@ public:
 			/* [annotation][in] */ 
 			__in  DWORD grfMode)
 		{
+			HRESULT hr;
+
 			if (pstream == NULL)
 				return E_POINTER;
 
-			CString strTempFile;
-			HRESULT hr;
-			if (FAILED(hr = RUt2::GetTempFilePath3(strTempFile)))
+			STATSTG stStat = {0};
+			if (FAILED(hr = pstream->Stat(&stStat, STATFLAG_DEFAULT)))
 				return hr;
 
-			STATSTG ss;
-			if (FAILED(hr = pstream->Stat(&ss, STATFLAG_DEFAULT)))
-				return hr;
+			TempFile tempFile(stStat.pwcsName);
+			CString tempFilePath = tempFile.Detach();
 
-			strTempFile += PathFindExtension(ss.pwcsName);
-
-			m_aryfptmp.Add(strTempFile);
+			m_aryfptmp.Add(tempFilePath);
 
 			BYTE buff[4096];
 			CAtlFile f;
-			if (SUCCEEDED(hr = f.Create(strTempFile, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, CREATE_ALWAYS))) {
+			if (SUCCEEDED(hr = f.Create(tempFilePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, CREATE_ALWAYS))) {
 				while (true) {
 					ULONG cbRead = 0;
 					if (FAILED(hr = pstream->Read(buff, 4096, &cbRead)))
@@ -195,7 +193,7 @@ public:
 						return hr;
 				}
 				f.Close();
-				return Initialize(strTempFile, grfMode);
+				return Initialize(tempFilePath, grfMode);
 			}
 			return hr;
 		}
@@ -278,32 +276,38 @@ public:
 		{
 			ObjectLock lck(this);
 			HRESULT hr;
-			int errc;
+			int errCode;
 
-			if (phBmpThumbnail == NULL)
+			if (phBmpThumbnail == NULL) {
 				return E_POINTER;
+			}
 
-			if (m_targetPath.IsEmpty())
+			if (m_targetPath.IsEmpty()) {
 				return E_FAIL;
+			}
 
 			LPCTSTR pszExt = PathFindExtension(m_targetPath);
-			if (pszExt == NULL)
+			if (pszExt == NULL) {
 				pszExt = _T(".");
-			CString strCmdlForm;
-			if (FAILED(hr = RUt::GetCommandLineForm(pszExt, strCmdlForm)))
-				return hr;
-			CString strTempFile;
-			if (FAILED(hr = RUt::GetTempFilePath2(strTempFile)))
-				return hr;
-			DelTmp dt(strTempFile);
+			}
+			GetFileExtsReg fileExt(pszExt);
+			if (!fileExt.valid) {
+				return E_FAIL;
+			}
+			TempFile tempFile(fileExt.suffix);
+			if (!tempFile.valid) {
+				return E_FAIL;
+			}
 
 			TCHAR tcWorkdir[MAX_PATH] = {0};
-			if (0 == GetTempPath(MAX_PATH, tcWorkdir))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == GetTempPath(MAX_PATH, tcWorkdir)) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			DWORD_PTR pvArgs[] = {
 				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(m_targetPath)),
-				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(strTempFile)),
+				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(tempFile.filePath)),
 				m_size.cx,
 				m_size.cy,
 				m_flags,
@@ -315,8 +319,10 @@ public:
 			};
 
 			TCHAR szCmdRun[2000 +1] = {0};
-			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, strCmdlForm, 0, 0, szCmdRun, 2000, (va_list *)pvArgs)))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, fileExt.commandLine, 0, 0, szCmdRun, 2000, (va_list *)pvArgs))) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			STARTUPINFO si;
 			ZeroMemory(&si, sizeof(si));
@@ -339,8 +345,10 @@ public:
 				&si,
 				&pi
 				);
-			if (!fCreated)
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (!fCreated) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			m_state = Running;
 
@@ -349,8 +357,9 @@ public:
 			m_state = Done;
 
 			DWORD errlv = 0;
-			if (!GetExitCodeProcess(pi.hProcess, &errlv))
+			if (!GetExitCodeProcess(pi.hProcess, &errlv)) {
 				errlv = 1;
+			}
 
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
@@ -358,7 +367,7 @@ public:
 			HBITMAP hbm = NULL;
 
 			if (errlv == 0) {
-				hbm = DecodePicture(strTempFile);
+				hbm = DecodePicture(tempFile.filePath);
 			}
 
 			*phBmpThumbnail = hbm;
@@ -377,93 +386,108 @@ public:
 			}
 		};
 
-		class RUt2 {
-		public:
-			static HRESULT GetTempFilePath3(CString &pStr) {
-				int errc;
-				TCHAR szDir[MAX_PATH] = {0};
-				if (0 == GetTempPath(MAX_PATH, szDir))
-					return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
-				GUID tmpId;
-				HRESULT hr;
-				if (FAILED(hr = CoCreateGuid(&tmpId)))
-					return hr;
-				CString strId;
-				for (int x = 0; x < 16; x++)
-					strId.AppendFormat(_T("%02x"), ((PBYTE)&tmpId)[x]);
-				TCHAR szPath[MAX_PATH] = {0};
-				PathCombine(szPath, szDir, CW2T(strId));
+		struct TempFile {
+			CString filePath;
+			bool valid;
 
-				pStr = szPath;
-				return S_OK;
+			TempFile(CString suffix): valid(false) {
+				TCHAR szDir[MAX_PATH] = {0};
+				if (0 != GetTempPath(MAX_PATH, szDir)) {
+					GUID tmpId;
+					HRESULT hr;
+					if (SUCCEEDED(hr = CoCreateGuid(&tmpId))) {
+						CString strId;
+						strId.AppendFormat(_T("%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X")
+							, 0U +tmpId.Data1
+							, 0U +tmpId.Data2
+							, 0U +tmpId.Data3
+							, 0U +tmpId.Data4[0]
+							, 0U +tmpId.Data4[1]
+							, 0U +tmpId.Data4[2]
+							, 0U +tmpId.Data4[3]
+							, 0U +tmpId.Data4[4]
+							, 0U +tmpId.Data4[5]
+							, 0U +tmpId.Data4[6]
+							, 0U +tmpId.Data4[7]
+							);
+						TCHAR szPath[MAX_PATH] = {0};
+						if (NULL != PathCombine(szPath, szDir, CW2T(strId))) {
+							if (0 == _tcscat_s(szPath, suffix)) {
+								valid = true;
+								filePath = szPath;
+								return;
+							}
+						}
+					}
+				}
+			}
+
+			CString Detach() {
+				CString ret = filePath;
+				filePath.Empty();
+				valid = false;
+				return ret;
+			}
+
+			~TempFile() {
+				if (valid) {
+					ATLVERIFY(DeleteFile(filePath));
+				}
 			}
 		};
 
-		class RUt {
-		public:
-			static HRESULT GetTempFilePath(CString &pStr) {
-				int errc;
-				TCHAR szDir[MAX_PATH] = {0};
-				if (0 == GetTempPath(MAX_PATH, szDir))
-					return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
-				TCHAR szPath[MAX_PATH] = {0};
-				if (0 == GetTempFileName(szDir, _T("tmp"), 0, szPath))
-					return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+		struct GetFileExtsReg {
+			CString commandLine;
+			CString suffix;
+			bool valid;
 
-				pStr = szPath;
-				return S_OK;
-			}
+			GetFileExtsReg(LPCTSTR pszExt, LPCTSTR pszVerb = NULL) {
+				CString strKey;
+				strKey.Format(_T("Software\\HIRAOKA HYPERS TOOLS, Inc.\\CmdThumbGen\\FileExts\\%s"), pszExt);
 
-			static HRESULT GetTempFilePath2(CString &pStr) {
-				int errc;
-				TCHAR szDir[MAX_PATH] = {0};
-				if (0 == GetTempPath(MAX_PATH, szDir))
-					return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
-				GUID tmpId;
-				HRESULT hr;
-				if (FAILED(hr = CoCreateGuid(&tmpId)))
-					return hr;
-				WCHAR wcId[MAX_PATH] = {0};
-				if (0 == StringFromGUID2(tmpId, wcId, MAX_PATH))
-					return E_OUTOFMEMORY;
-				TCHAR szPath[MAX_PATH] = {0};
-				PathCombine(szPath, szDir, CW2T(wcId));
-
-				pStr = szPath;
-				return S_OK;
-			}
-
-			static HRESULT GetCommandLineForm(LPCTSTR pszExt, CString &pStr, LPCTSTR pszVerb = NULL) {
-				LONG lerr;
-				{
+				LONG errCode;
+				bool has = false;
+				if (!has) {
+					// HKCU
 					CRegKey rkExt;
-					CString strKey; strKey.Format(_T("Software\\HIRAOKA HYPERS TOOLS, Inc.\\CmdThumbGen\\FileExts\\%s")
-						, pszExt);
-					if (0 == (lerr = rkExt.Open(HKEY_CURRENT_USER, strKey, KEY_READ))) {
+					if (0 == (errCode = rkExt.Open(HKEY_CURRENT_USER, strKey, KEY_READ))) {
 						TCHAR szRet[256 +1] = {0};
-						ULONG cchRet = 256;
-						if (0 == (lerr = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
-							pStr = CString(szRet, cchRet);
-							return NOERROR;
+						ULONG cchRet;
+
+						cchRet = 256;
+						if (0 == (errCode = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
+							commandLine = CString(szRet, cchRet);
+							has = true;
+
+							cchRet = 256;
+							if (0 == (errCode = rkExt.QueryStringValue(_T("Suffix"), szRet, &cchRet))) {
+								suffix = CString(szRet, cchRet);
+							}
 						}
 					}
 				}
 
-				{
+				if (!has) {
+					// HKLM
 					CRegKey rkExt;
-					CString strKey; strKey.Format(_T("Software\\HIRAOKA HYPERS TOOLS, Inc.\\CmdThumbGen\\FileExts\\%s")
-						, pszExt);
-					if (0 == (lerr = rkExt.Open(HKEY_LOCAL_MACHINE, strKey, KEY_READ))) {
+					if (0 == (errCode = rkExt.Open(HKEY_LOCAL_MACHINE, strKey, KEY_READ))) {
 						TCHAR szRet[256 +1] = {0};
-						ULONG cchRet = 256;
-						if (0 == (lerr = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
-							pStr = CString(szRet, cchRet);
-							return NOERROR;
+						ULONG cchRet;
+
+						cchRet = 256;
+						if (0 == (errCode = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
+							commandLine = CString(szRet, cchRet);
+							has = true;
+
+							cchRet = 256;
+							if (0 == (errCode = rkExt.QueryStringValue(_T("Suffix"), szRet, &cchRet))) {
+								suffix = CString(szRet, cchRet);
+							}
 						}
 					}
 				}
 
-				return E_NOT_SET;
+				valid = has;
 			}
 		};
 
@@ -473,14 +497,17 @@ public:
 		{
 			ObjectLock lck(this);
 			HRESULT hr;
-			int errc;
+			int errCode;
 			CAtlFile f;
 			if (SUCCEEDED(hr = f.Create(m_targetPath, GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE, OPEN_EXISTING))) {
 				if (GetFileTime(f, NULL, NULL, pDateStamp)) {
 					f.Close();
 					return S_OK;
 				}
-				else { errc = GetLastError(), hr = HRESULT_FROM_WIN32(errc); }
+				else {
+					errCode = GetLastError();
+					hr = HRESULT_FROM_WIN32(errCode);
+				}
 			}
 			return hr;
 		}
@@ -529,28 +556,34 @@ public:
 		{
 			ObjectLock lck(this);
 			HRESULT hr;
-			int errc;
+			int errCode;
 
-			if (phbmp == NULL)
+			if (phbmp == NULL) {
 				return E_POINTER;
+			}
 
-			if (m_targetPath.IsEmpty())
+			if (m_targetPath.IsEmpty()) {
 				return E_FAIL;
+			}
 
 			LPCTSTR pszExt = PathFindExtension(m_targetPath);
-			if (pszExt == NULL)
+			if (pszExt == NULL) {
 				pszExt = _T(".");
-			CString strCmdlForm;
-			if (FAILED(hr = RUt::GetCommandLineForm(pszExt, strCmdlForm, (iCurPage == 0) ? NULL : _T("MP"))))
-				return hr;
-			CString strTempFile;
-			if (FAILED(hr = RUt::GetTempFilePath2(strTempFile)))
-				return hr;
-			DelTmp dt(strTempFile);
+			}
+			GetFileExtsReg fileExt(pszExt, (iCurPage == 0) ? NULL : _T("MP"));
+			if (!fileExt.valid) {
+				return E_FAIL;
+			}
+			TempFile tempFile(fileExt.suffix);
+			if (!tempFile.valid) {
+				return E_FAIL;
+			}
 
 			TCHAR tcWorkdir[MAX_PATH] = {0};
-			if (0 == GetTempPath(MAX_PATH, tcWorkdir))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == GetTempPath(MAX_PATH, tcWorkdir)) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			// if iCurPage == 0, output first page with verb "".
 			// if iCurPage == 1, output first page with verb "MP".
@@ -559,7 +592,7 @@ public:
 
 			DWORD_PTR pvArgs[] = {
 				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(m_targetPath)),
-				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(strTempFile)),
+				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(tempFile.filePath)),
 				cx,
 				cx,
 				IEIFLAG_ORIGSIZE, // m_flags
@@ -571,8 +604,10 @@ public:
 			};
 
 			TCHAR szCmdRun[2000 +1] = {0};
-			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, strCmdlForm, 0, 0, szCmdRun, 2000, (va_list *)pvArgs)))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, fileExt.commandLine, 0, 0, szCmdRun, 2000, (va_list *)pvArgs))) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			STARTUPINFO si;
 			ZeroMemory(&si, sizeof(si));
@@ -595,8 +630,10 @@ public:
 				&si,
 				&pi
 				);
-			if (!fCreated)
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (!fCreated) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			m_state = Running;
 
@@ -605,8 +642,9 @@ public:
 			m_state = Done;
 
 			DWORD errlv = 0;
-			if (!GetExitCodeProcess(pi.hProcess, &errlv))
+			if (!GetExitCodeProcess(pi.hProcess, &errlv)) {
 				errlv = 1;
+			}
 
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
@@ -614,7 +652,7 @@ public:
 			HBITMAP hbm = NULL;
 
 			if (errlv == 0) {
-				hbm = DecodePicture(strTempFile);
+				hbm = DecodePicture(tempFile.filePath);
 			}
 
 			if (pdwAlpha != NULL) {
@@ -647,32 +685,38 @@ public:
 		{
 			ObjectLock lck(this);
 			HRESULT hr;
-			int errc;
+			int errCode;
 
-			if (pcPages == NULL)
+			if (pcPages == NULL) {
 				return E_POINTER;
+			}
 
-			if (m_targetPath.IsEmpty())
+			if (m_targetPath.IsEmpty()) {
 				return E_FAIL;
+			}
 
 			LPCTSTR pszExt = PathFindExtension(m_targetPath);
-			if (pszExt == NULL)
+			if (pszExt == NULL) {
 				pszExt = _T(".");
-			CString strCmdlForm;
-			if (FAILED(hr = RUt::GetCommandLineForm(pszExt, strCmdlForm, _T("GPC"))))
-				return hr;
-			CString strTempFile;
-			if (FAILED(hr = RUt::GetTempFilePath2(strTempFile)))
-				return hr;
-			DelTmp dt(strTempFile);
+			}
+			GetFileExtsReg fileExt(pszExt, _T("GPC"));
+			if (!fileExt.valid) {
+				return E_FAIL;
+			}
+			TempFile tempFile(fileExt.suffix);
+			if (!tempFile.valid) {
+				return E_FAIL;
+			}
 
 			TCHAR tcWorkdir[MAX_PATH] = {0};
-			if (0 == GetTempPath(MAX_PATH, tcWorkdir))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == GetTempPath(MAX_PATH, tcWorkdir)) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			DWORD_PTR pvArgs[] = {
 				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(m_targetPath)),
-				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(strTempFile)), // width for output
+				reinterpret_cast<DWORD_PTR>(static_cast<LPCTSTR>(tempFile.filePath)), // width for output
 				0,
 				0,
 				0,
@@ -684,8 +728,10 @@ public:
 			};
 
 			TCHAR szCmdRun[2000 +1] = {0};
-			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, strCmdlForm, 0, 0, szCmdRun, 2000, (va_list *)pvArgs)))
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (0 == (FormatMessage(FORMAT_MESSAGE_FROM_STRING|FORMAT_MESSAGE_ARGUMENT_ARRAY, fileExt.commandLine, 0, 0, szCmdRun, 2000, (va_list *)pvArgs))) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			STARTUPINFO si;
 			ZeroMemory(&si, sizeof(si));
@@ -708,20 +754,23 @@ public:
 				&si,
 				&pi
 				);
-			if (!fCreated)
-				return errc = GetLastError(), HRESULT_FROM_WIN32(errc);
+			if (!fCreated) {
+				errCode = GetLastError();
+				return HRESULT_FROM_WIN32(errCode);
+			}
 
 			WaitForSingleObject(pi.hProcess, INFINITE);
 
 			DWORD errlv = 0;
-			if (!GetExitCodeProcess(pi.hProcess, &errlv))
+			if (!GetExitCodeProcess(pi.hProcess, &errlv)) {
 				errlv = 1;
+			}
 
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
 
 			if (errlv == 0) {
-				CString text = FUt::ReadFile(strTempFile, 1000);
+				CString text = FUt::ReadFile(tempFile.filePath, 1000);
 				if (text.GetLength() != 0) {
 					*pcPages = _ttoi(text);
 					return S_OK;
