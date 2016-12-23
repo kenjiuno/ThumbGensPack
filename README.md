@@ -69,9 +69,11 @@ HKLM
 (Default)
 MP
 GPC
+Suffix
 ```
+Note: `Suffix` has been added since 1.2.14.
 
-#### (Default) and MP
+#### `(Default)` and `MP`
 Specify a command line thumbnail generator.
 
 It extracts a single page thumbnail from your document.
@@ -91,7 +93,7 @@ Example:
 
 %2
 * output file path (is a temp file path)
-
+* `Suffix` value is appended.
 
 %3
 * width in pixels
