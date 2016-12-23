@@ -71,7 +71,8 @@ MP
 GPC
 Suffix
 ```
-Note: `Suffix` has been added since 1.2.14.
+
+**Note:** Since 1.2.14, `Suffix` is available.
 
 #### `(Default)` and `MP`
 Specify a command line thumbnail generator.
@@ -92,8 +93,10 @@ Example:
 
 
 %2
-* output file path (is a temp file path)
+* output file path (is a temp file path) with no file extension.
 * `Suffix` value is appended.
+* _Since 1.2.14_: output file is decoded by `Windows Imaging Component`, and then try `LoadImage` API.
+* _Before 1.2.13_: output file is decoded by `LoadImage` API.
 
 %3
 * width in pixels
