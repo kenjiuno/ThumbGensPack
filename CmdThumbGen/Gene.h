@@ -69,6 +69,8 @@ END_COM_MAP()
 		m_aryfptmp.RemoveAll();
 	}
 
+	HBITMAP DecodePicture(CString filePath);
+
 protected:
 	DWORD iCurPage;
 
@@ -156,13 +158,13 @@ public:
 		SIZE m_size;
 		DWORD m_flags;
 
-    // IInitializeWithStream : public IUnknown
-    public:
-        virtual /* [local] */ HRESULT STDMETHODCALLTYPE Initialize( 
-            /* [annotation][in] */ 
-            __in  IStream *pstream,
-            /* [annotation][in] */ 
-            __in  DWORD grfMode)
+	// IInitializeWithStream : public IUnknown
+	public:
+		virtual /* [local] */ HRESULT STDMETHODCALLTYPE Initialize( 
+			/* [annotation][in] */ 
+			__in  IStream *pstream,
+			/* [annotation][in] */ 
+			__in  DWORD grfMode)
 		{
 			if (pstream == NULL)
 				return E_POINTER;
@@ -198,11 +200,11 @@ public:
 			return hr;
 		}
 
-    // IInitializeWithItem : public IUnknown
-    public:
-        virtual HRESULT STDMETHODCALLTYPE Initialize( 
-            /* [in] */ __RPC__in_opt IShellItem *psi,
-            /* [in] */ DWORD grfMode)
+	// IInitializeWithItem : public IUnknown
+	public:
+		virtual HRESULT STDMETHODCALLTYPE Initialize( 
+			/* [in] */ __RPC__in_opt IShellItem *psi,
+			/* [in] */ DWORD grfMode)
 		{
 			ObjectLock lck(this);
 
@@ -356,7 +358,7 @@ public:
 			HBITMAP hbm = NULL;
 
 			if (errlv == 0) {
-				hbm = reinterpret_cast<HBITMAP>(LoadImage(NULL, strTempFile, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE|LR_VGACOLOR));
+				hbm = DecodePicture(strTempFile);
 			}
 
 			*phBmpThumbnail = hbm;
@@ -612,8 +614,7 @@ public:
 			HBITMAP hbm = NULL;
 
 			if (errlv == 0) {
-				hbm = reinterpret_cast<HBITMAP>(LoadImage(NULL, strTempFile, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE|LR_VGACOLOR));
-
+				hbm = DecodePicture(strTempFile);
 			}
 
 			if (pdwAlpha != NULL) {
@@ -639,10 +640,10 @@ public:
 			return (*phbmp != NULL) ? S_OK : E_FAIL;
 		}
 
-    // ISetPage4ThumbnailProvider : public IUnknown
-    public:
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetPageCount( 
-            /* [out] */ DWORD *pcPages)
+	// ISetPage4ThumbnailProvider : public IUnknown
+	public:
+		virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetPageCount( 
+			/* [out] */ DWORD *pcPages)
 		{
 			ObjectLock lck(this);
 			HRESULT hr;
@@ -730,9 +731,9 @@ public:
 
 			return E_FAIL;
 		}
-        
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetActivePage( 
-            /* [in] */ DWORD iPage)
+		
+		virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetActivePage( 
+			/* [in] */ DWORD iPage)
 		{
 			iCurPage = iPage;
 			return S_OK;

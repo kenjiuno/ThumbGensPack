@@ -42,4 +42,12 @@
 
 #include <thumbcache.h>
 
+#if WIC // Windows Imaging Component
+#include <wincodec.h>
+#pragma comment(lib, "Windowscodecs.lib")
+
+// IWICImagingFactory interface
+// https://msdn.microsoft.com/ja-jp/library/windows/desktop/ee690281(v=vs.85).aspx
+#endif
+
 using namespace ATL;
