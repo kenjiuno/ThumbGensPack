@@ -25,4 +25,4 @@ iPage of SetActivePage:
 | iPage | Command type invoked |
 |:-----:|----------------------|
 |   0   | Invoke `(Default)` command. |
-| Positive numbers <br /> 1,2,3,... | Invoke `MP` command. |
+| Positive page numbers | Invoke `MP` command. |
