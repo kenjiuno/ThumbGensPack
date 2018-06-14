@@ -24,8 +24,8 @@ HKLM
 
 Under `(.fileExtension)` registry key, you can set these values:
 
-| Value's name | Type | Usage |
-|:------------:|:----:|-------|
+| Value's name | Contents | Usage |
+|:------------:|:--------:|-------|
 | `(Default)`  | Command line with parameters | A single page document (like JPG/PNG). |
 | `MP`         | Command line with parameters | A multipage document (like TIF/PDF). This is optional. |
 | `GPC`        | Command line with parameters | GPC means GetPageCount |
