@@ -22,6 +22,9 @@
 !define EPKey1 "{db1447dd-b517-4bab-962f-0f6c472cac35}"
 !define EPKey2 "{1fcbd4d2-83e3-4b3d-8400-f0baf8969bb8}"
 
+!system 'MySign ".\pdf2bmp2\release\pdf2bmp2.exe" ".\pdfpcnt\bin\Release\pdfpcnt.exe" ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe" ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe" ".\dxf2bmp\bin\Release\dxf2bmp.exe"'
+!finalize 'MySign "%1"'
+
 ; The name of the installer
 Name "${APP} ${VER}"
 
