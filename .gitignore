@@ -352,3 +352,11 @@ MigrationBackup/
 
 /Setup_ThumbGensPack.exe
 /Doxygen
+/pdf2bmp2/CxImage/Unicode_Debug/cximage.lib
+/pdf2bmp2/CxImage/Unicode_Debug/vc80.idb
+/pdf2bmp2/CxImage/Unicode_Release/cximage.lib
+/pdf2bmp2/CxImage/Unicode_Release/vc80.idb
+/pdf2bmp2/jpeg/Unicode_Debug/Jpeg.lib
+/pdf2bmp2/jpeg/Unicode_Debug/vc80.idb
+/pdf2bmp2/jpeg/Unicode_Release/Jpeg.lib
+/pdf2bmp2/jpeg/Unicode_Release/vc80.idb
