@@ -3,12 +3,12 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 7.00.0555 */
-/* at Fri Dec 23 16:39:36 2016
+ /* File created by MIDL compiler version 8.01.0622 */
+/* at Tue Jan 19 12:14:07 2038
  */
-/* Compiler settings for .\CmdThumbGen.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
-    protocol : dce , ms_ext, c_ext
+/* Compiler settings for CmdThumbGen.idl:
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
+    protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
@@ -16,12 +16,11 @@
 */
 /* @@MIDL_FILE_HEADING(  ) */
 
-#pragma warning( disable: 4049 )  /* more than 64k source lines */
 
 
 /* verify that the <rpcndr.h> version is high enough to compile this file*/
 #ifndef __REQUIRED_RPCNDR_H_VERSION__
-#define __REQUIRED_RPCNDR_H_VERSION__ 440
+#define __REQUIRED_RPCNDR_H_VERSION__ 500
 #endif
 
 #include "rpc.h"
@@ -29,7 +28,7 @@
 
 #ifndef __RPCNDR_H_VERSION__
 #error this stub requires an updated version of <rpcndr.h>
-#endif // __RPCNDR_H_VERSION__
+#endif /* __RPCNDR_H_VERSION__ */
 
 #ifndef COM_NO_WINDOWS_H
 #include "windows.h"
@@ -48,12 +47,14 @@
 #ifndef __IGene_FWD_DEFINED__
 #define __IGene_FWD_DEFINED__
 typedef interface IGene IGene;
+
 #endif 	/* __IGene_FWD_DEFINED__ */
 
 
 #ifndef __ISetPage4ThumbnailProvider_FWD_DEFINED__
 #define __ISetPage4ThumbnailProvider_FWD_DEFINED__
 typedef interface ISetPage4ThumbnailProvider ISetPage4ThumbnailProvider;
+
 #endif 	/* __ISetPage4ThumbnailProvider_FWD_DEFINED__ */
 
 
@@ -97,6 +98,7 @@ EXTERN_C const IID IID_IGene;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IGeneVtbl
@@ -107,7 +109,7 @@ EXTERN_C const IID IID_IGene;
             IGene * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
-            __RPC__deref_out  void **ppvObject);
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IGene * This);
@@ -172,6 +174,7 @@ EXTERN_C const IID IID_ISetPage4ThumbnailProvider;
         
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct ISetPage4ThumbnailProviderVtbl
@@ -182,7 +185,7 @@ EXTERN_C const IID IID_ISetPage4ThumbnailProvider;
             ISetPage4ThumbnailProvider * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
-            __RPC__deref_out  void **ppvObject);
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             ISetPage4ThumbnailProvider * This);

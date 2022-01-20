@@ -1,12 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdThumbGen", "CmdThumbGen.vcproj", "{563B8C71-3FF0-48B8-8017-B34170BC5D69}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdThumbGenPS", "CmdThumbGenPS.vcproj", "{59457C1D-37E1-446E-83C1-09ED9A6B0D06}"
-	ProjectSection(ProjectDependencies) = postProject
-		{563B8C71-3FF0-48B8-8017-B34170BC5D69} = {563B8C71-3FF0-48B8-8017-B34170BC5D69}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CmdThumbGen", "CmdThumbGen.vcxproj", "{563B8C71-3FF0-48B8-8017-B34170BC5D69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,12 +21,11 @@ Global
 		{563B8C71-3FF0-48B8-8017-B34170BC5D69}.Release|Win32.Build.0 = Release|Win32
 		{563B8C71-3FF0-48B8-8017-B34170BC5D69}.Release|x64.ActiveCfg = Release|x64
 		{563B8C71-3FF0-48B8-8017-B34170BC5D69}.Release|x64.Build.0 = Release|x64
-		{59457C1D-37E1-446E-83C1-09ED9A6B0D06}.Debug|Win32.ActiveCfg = Debug|Win32
-		{59457C1D-37E1-446E-83C1-09ED9A6B0D06}.Debug|x64.ActiveCfg = Debug|Win32
-		{59457C1D-37E1-446E-83C1-09ED9A6B0D06}.Release|Win32.ActiveCfg = Release|Win32
-		{59457C1D-37E1-446E-83C1-09ED9A6B0D06}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E6C65634-CD24-4997-9D42-DB68F9F7B87A}
 	EndGlobalSection
 EndGlobal

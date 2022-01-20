@@ -3,12 +3,12 @@
 /* this ALWAYS GENERATED file contains the proxy stub code */
 
 
- /* File created by MIDL compiler version 7.00.0555 */
-/* at Fri Dec 23 16:39:36 2016
+ /* File created by MIDL compiler version 8.01.0622 */
+/* at Tue Jan 19 12:14:07 2038
  */
-/* Compiler settings for .\CmdThumbGen.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
-    protocol : dce , ms_ext, c_ext
+/* Compiler settings for CmdThumbGen.idl:
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
+    protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
@@ -16,10 +16,9 @@
 */
 /* @@MIDL_FILE_HEADING(  ) */
 
-#if !defined(_M_IA64) && !defined(_M_AMD64)
+#if !defined(_M_IA64) && !defined(_M_AMD64) && !defined(_ARM_)
 
 
-#pragma warning( disable: 4049 )  /* more than 64k source lines */
 #if _MSC_VER >= 1200
 #pragma warning(push)
 #endif
@@ -37,7 +36,7 @@
 
 /* verify that the <rpcproxy.h> version is high enough to compile this file*/
 #ifndef __REDQ_RPCPROXY_H_VERSION__
-#define __REQUIRED_RPCPROXY_H_VERSION__ 440
+#define __REQUIRED_RPCPROXY_H_VERSION__ 475
 #endif
 
 
@@ -50,7 +49,7 @@
 #include "CmdThumbGen.h"
 
 #define TYPE_FORMAT_STRING_SIZE   7                                 
-#define PROC_FORMAT_STRING_SIZE   57                                
+#define PROC_FORMAT_STRING_SIZE   73                                
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   0            
@@ -101,10 +100,9 @@ extern const MIDL_STUBLESS_PROXY_INFO ISetPage4ThumbnailProvider_ProxyInfo;
 #if !defined(__RPC_WIN32__)
 #error  Invalid build platform for this stub.
 #endif
-
-#if !(TARGET_IS_NT40_OR_LATER)
-#error You need Windows NT 4.0 or later to run this stub because it uses these features:
-#error   -Oif or -Oicf.
+#if !(TARGET_IS_NT60_OR_LATER)
+#error You need Windows Vista or later to run this stub because it uses these features:
+#error   forced complex structure or array, compiled for Windows Vista.
 #error However, your C/C++ compilation flags indicate you intend to run this app on earlier systems.
 #error This app will fail with the RPC_X_WRONG_STUB_VERSION error.
 #endif
@@ -124,47 +122,57 @@ static const CmdThumbGen_MIDL_PROC_FORMAT_STRING CmdThumbGen__MIDL_ProcFormatStr
 /*  8 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
 /* 10 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 12 */	NdrFcShort( 0x24 ),	/* 36 */
-/* 14 */	0x4,		/* Oi2 Flags:  has return, */
+/* 14 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x2,		/* 2 */
+/* 16 */	0x8,		/* 8 */
+			0x1,		/* Ext Flags:  new corr desc, */
+/* 18 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 20 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 22 */	NdrFcShort( 0x0 ),	/* 0 */
 
 	/* Parameter pcPages */
 
-/* 16 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
-/* 18 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 20 */	0x8,		/* FC_LONG */
+/* 24 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
+/* 26 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 28 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Return value */
 
-/* 22 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 24 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 26 */	0x8,		/* FC_LONG */
+/* 30 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 32 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 34 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Procedure SetActivePage */
 
-/* 28 */	0x33,		/* FC_AUTO_HANDLE */
+/* 36 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
-/* 30 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 34 */	NdrFcShort( 0x5 ),	/* 5 */
-/* 36 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 38 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 40 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 42 */	0x4,		/* Oi2 Flags:  has return, */
+/* 38 */	NdrFcLong( 0x0 ),	/* 0 */
+/* 42 */	NdrFcShort( 0x5 ),	/* 5 */
+/* 44 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
+/* 46 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 48 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 50 */	0x44,		/* Oi2 Flags:  has return, has ext, */
 			0x2,		/* 2 */
+/* 52 */	0x8,		/* 8 */
+			0x1,		/* Ext Flags:  new corr desc, */
+/* 54 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 56 */	NdrFcShort( 0x0 ),	/* 0 */
+/* 58 */	NdrFcShort( 0x0 ),	/* 0 */
 
 	/* Parameter iPage */
 
-/* 44 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
-/* 46 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 48 */	0x8,		/* FC_LONG */
+/* 60 */	NdrFcShort( 0x48 ),	/* Flags:  in, base type, */
+/* 62 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
+/* 64 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 	/* Return value */
 
-/* 50 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 52 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 54 */	0x8,		/* FC_LONG */
+/* 66 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 68 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 70 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 			0x0
@@ -251,7 +259,7 @@ static const unsigned short ISetPage4ThumbnailProvider_FormatStringOffsetTable[]
     {
     (unsigned short) -1,
     0,
-    28
+    36
     };
 
 static const MIDL_STUBLESS_PROXY_INFO ISetPage4ThumbnailProvider_ProxyInfo =
@@ -316,9 +324,9 @@ static const MIDL_STUB_DESC Object_StubDesc =
     0,
     CmdThumbGen__MIDL_TypeFormatString.Format,
     1, /* -error bounds_check flag */
-    0x20000, /* Ndr library version */
+    0x60001, /* Ndr library version */
     0,
-    0x700022b, /* MIDL Version 7.0.555 */
+    0x801026e, /* MIDL Version 8.1.622 */
     0,
     0,
     0,  /* notify & notify_flag routine table */
@@ -388,5 +396,5 @@ const ExtendedProxyFileInfo CmdThumbGen_ProxyFileInfo =
 #endif
 
 
-#endif /* !defined(_M_IA64) && !defined(_M_AMD64)*/
+#endif /* !defined(_M_IA64) && !defined(_M_AMD64) && !defined(_ARM_) */
 

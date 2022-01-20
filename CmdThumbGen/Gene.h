@@ -445,43 +445,30 @@ public:
 				CString strKey;
 				strKey.Format(_T("Software\\HIRAOKA HYPERS TOOLS, Inc.\\CmdThumbGen\\FileExts\\%s"), pszExt);
 
-				LONG errCode;
 				bool has = false;
-				if (!has) {
-					// HKCU
-					CRegKey rkExt;
-					if (0 == (errCode = rkExt.Open(HKEY_CURRENT_USER, strKey, KEY_READ))) {
-						TCHAR szRet[256 +1] = {0};
-						ULONG cchRet;
-
-						cchRet = 256;
-						if (0 == (errCode = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
-							commandLine = CString(szRet, cchRet);
-							has = true;
-
-							cchRet = 256;
-							if (0 == (errCode = rkExt.QueryStringValue(_T("Suffix"), szRet, &cchRet))) {
-								suffix = CString(szRet, cchRet);
-							}
-						}
-					}
-				}
-
-				if (!has) {
-					// HKLM
-					CRegKey rkExt;
-					if (0 == (errCode = rkExt.Open(HKEY_LOCAL_MACHINE, strKey, KEY_READ))) {
-						TCHAR szRet[256 +1] = {0};
-						ULONG cchRet;
-
-						cchRet = 256;
-						if (0 == (errCode = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
-							commandLine = CString(szRet, cchRet);
-							has = true;
+				for (int pattern = 0; !has && pattern < 4; pattern++) {
+					if (!has) {
+						HKEY rootKey = (pattern & 2) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+#if defined(_WIN64)
+						REGSAM samDesired = KEY_READ | ((pattern & 1) ? KEY_WOW64_32KEY : 0);
+#else
+						REGSAM samDesired = KEY_READ | ((pattern & 1) ? KEY_WOW64_64KEY : 0);
+#endif
+						CRegKey rkExt;
+						LONG errCode;
+						if (0 == (errCode = rkExt.Open(rootKey, strKey, samDesired))) {
+							TCHAR szRet[256 + 1] = { 0 };
+							ULONG cchRet;
 
 							cchRet = 256;
-							if (0 == (errCode = rkExt.QueryStringValue(_T("Suffix"), szRet, &cchRet))) {
-								suffix = CString(szRet, cchRet);
+							if (0 == (errCode = rkExt.QueryStringValue(pszVerb, szRet, &cchRet))) {
+								commandLine = CString(szRet, cchRet);
+								has = true;
+
+								cchRet = 256;
+								if (0 == (errCode = rkExt.QueryStringValue(_T("Suffix"), szRet, &cchRet))) {
+									suffix = CString(szRet, cchRet);
+								}
 							}
 						}
 					}
