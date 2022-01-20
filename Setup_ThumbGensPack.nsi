@@ -11,7 +11,7 @@
 !define TTL "ThumbGensPack ${__TIMESTAMP__}"
 !define COM "HIRAOKA HYPERS TOOLS, Inc."
 
-!define VER "1.2.15"
+!define VER "1.2.16"
 
 !define CLSID "{93FB1A02-084D-43B4-A69F-65d8b86f2ab3}"
 
@@ -22,7 +22,7 @@
 !define EPKey1 "{db1447dd-b517-4bab-962f-0f6c472cac35}"
 !define EPKey2 "{1fcbd4d2-83e3-4b3d-8400-f0baf8969bb8}"
 
-!system 'MySign ".\pdf2bmp2\release\pdf2bmp2.exe" ".\pdfpcnt\bin\Release\pdfpcnt.exe" ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe" ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe" ".\dxf2bmp\bin\Release\dxf2bmp.exe"'
+!system 'MySign ".\pdf2bmp2\release\pdf2bmp2.exe" ".\pdfpcnt\bin\Release\pdfpcnt.exe" ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe" ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe" ".\dxf2bmp\bin\Release\dxf2bmp.exe" "CmdThumbGen\Release\CmdThumbGen.dll" "CmdThumbGen\x64\Release\CmdThumbGen.dll"'
 !finalize 'MySign "%1"'
 
 ; The name of the installer
@@ -43,9 +43,10 @@ InstallDirRegKey HKLM "Software\${COM}\${APP}" "Install_Dir"
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
 
-!define DOTNET_VERSION "2.0"
+SetCompressor /solid zlib
 
-!include "DotNET.nsh"
+XPStyle on
+
 !include "LogicLib.nsh"
 
 !include "Registry.nsh"
@@ -80,8 +81,6 @@ SetOverwrite ifdiff
 ; - - - Section - - -
 Section ""
   SetOutPath $INSTDIR
-
-  !insertmacro CheckDotNET ${DOTNET_VERSION}
 
   ; Write the installation path into the registry
   WriteRegStr HKLM "Software\${COM}\${APP}" "Install_Dir" "$INSTDIR"
