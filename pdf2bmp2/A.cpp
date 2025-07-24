@@ -9,6 +9,12 @@
 
 #include <ximage.h>
 
+#if defined(DEBUG)
+#pragma comment(lib, "CxImage/Debug/cximage.lib")
+#else
+#pragma comment(lib, "CxImage/Release/cximage.lib")
+#endif
+
 namespace Ut {
 	CString GetTempDir() {
 		TCHAR tc[MAX_PATH] = {0};

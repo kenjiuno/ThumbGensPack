@@ -11,7 +11,7 @@
 !define TTL "ThumbGensPack ${__TIMESTAMP__}"
 !define COM "HIRAOKA HYPERS TOOLS, Inc."
 
-!define VER "1.2.16"
+!define VER "1.2.17"
 
 !define CLSID "{93FB1A02-084D-43B4-A69F-65d8b86f2ab3}"
 
@@ -22,7 +22,20 @@
 !define EPKey1 "{db1447dd-b517-4bab-962f-0f6c472cac35}"
 !define EPKey2 "{1fcbd4d2-83e3-4b3d-8400-f0baf8969bb8}"
 
-!system 'MySign ".\pdf2bmp2\release\pdf2bmp2.exe" ".\pdfpcnt\bin\Release\pdfpcnt.exe" ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe" ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe" ".\dxf2bmp\bin\Release\dxf2bmp.exe" "CmdThumbGen\Release\CmdThumbGen.dll" "CmdThumbGen\x64\Release\CmdThumbGen.dll"'
+!define CmdThumbGen_X86 "CmdThumbGen\Release"
+!define CmdThumbGen_X64 "CmdThumbGen\x64\Release"
+!define CmdThumbGen_ARM64X "CmdThumbGen\ARM64EC\Release"
+
+!system 'MySign \
+  ".\pdf2bmp2\release\pdf2bmp2.exe" \
+  ".\pdfpcnt\bin\Release\pdfpcnt.exe" \
+  ".\bpg2bmp\bin\DEBUG\bpg2bmp.exe" \
+  ".\Jnt2bmp\bin\x86\DEBUG\Jnt2bmp.exe" \
+  ".\dxf2bmp\bin\Release\dxf2bmp.exe" \
+  "${CmdThumbGen_X86}\CmdThumbGen.dll" \
+  "${CmdThumbGen_X64}\CmdThumbGen.dll" \
+  "${CmdThumbGen_ARM64X}\CmdThumbGen.dll" \
+'
 !finalize 'MySign "%1"'
 
 ; The name of the installer
@@ -99,8 +112,8 @@ Section "CmdThumbGen “±“ü"
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
 
-  File ".\CmdThumbGen\Release\CmdThumbGen.dll"
-  File ".\CmdThumbGen\Release\CmdThumbGen.pdb"
+  File "${CmdThumbGen_X86}\CmdThumbGen.dll"
+  File "${CmdThumbGen_X86}\CmdThumbGen.pdb"
 
   ExecWait 'REGSVR32 /s "$OUTDIR\CmdThumbGen.dll"' $0
   DetailPrint "Œ‹‰Ê: $0"
@@ -110,8 +123,19 @@ Section /o "CmdThumbGen(x64) “±“ü" SEC_CMDTHUMBGEN_X64
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR\x64
 
-  File ".\CmdThumbGen\x64\Release\CmdThumbGen.dll"
-  File ".\CmdThumbGen\x64\Release\CmdThumbGen.pdb"
+  File "${CmdThumbGen_X64}\CmdThumbGen.dll"
+  File "${CmdThumbGen_X64}\CmdThumbGen.pdb"
+
+  ExecWait 'REGSVR32 /s "$OUTDIR\CmdThumbGen.dll"' $0
+  DetailPrint "Œ‹‰Ê: $0"
+SectionEnd
+
+Section /o "CmdThumbGen(Arm64X) “±“ü" SEC_CMDTHUMBGEN_ARM64X
+  ; Set output path to the installation directory.
+  SetOutPath $INSTDIR\x64
+
+  File "${CmdThumbGen_ARM64X}\CmdThumbGen.dll"
+  File "${CmdThumbGen_ARM64X}\CmdThumbGen.pdb"
 
   ExecWait 'REGSVR32 /s "$OUTDIR\CmdThumbGen.dll"' $0
   DetailPrint "Œ‹‰Ê: $0"
@@ -305,8 +329,7 @@ SectionGroup "DXF‘Î‰ž"
     SetOutPath $INSTDIR
 
     ; Put file there
-    File ".\dxf2bmp\bin\Release\dxf2bmp.pdb"
-    File ".\dxf2bmp\bin\Release\dxf2bmp.exe"
+    File ".\dxf2bmp\bin\Release\dxf2bmp.*"
 
     ${If} 32 < 8086
       WriteRegStr HKLM "Software\HIRAOKA HYPERS TOOLS, Inc.\CmdThumbGen\FileExts\.dxf" "" '"$INSTDIR\dxf2bmp.exe" "%1!s!" "%2!s!" "%3!u!" "%4!u!"'
@@ -352,8 +375,12 @@ Function .onInit
 ;    SectionSetFlags ${SEC_JOURNAL} ${SF_SELECTED}
 ;  Skip:
   
-  ${If} $PROGRAMFILES32 != $PROGRAMFILES64
+  ${If} ${IsNativeAMD64}
     SectionSetFlags ${SEC_CMDTHUMBGEN_X64} ${SF_SELECTED}
+  ${EndIf}
+
+  ${If} ${IsNativeARM64}
+    SectionSetFlags ${SEC_CMDTHUMBGEN_ARM64X} ${SF_SELECTED}
   ${EndIf}
 FunctionEnd
 

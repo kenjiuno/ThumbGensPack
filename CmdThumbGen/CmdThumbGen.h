@@ -3,11 +3,11 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.01.0622 */
+ /* File created by MIDL compiler version 8.01.0628 */
 /* at Tue Jan 19 12:14:07 2038
  */
 /* Compiler settings for CmdThumbGen.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0628 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -40,6 +40,14 @@
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
+
+#ifndef DECLSPEC_XFGVIRT
+#if defined(_CONTROL_FLOW_GUARD_XFG)
+#define DECLSPEC_XFGVIRT(base, func) __declspec(xfg_virtual(base, func))
+#else
+#define DECLSPEC_XFGVIRT(base, func)
+#endif
 #endif
 
 /* Forward Declarations */ 
@@ -105,15 +113,18 @@ EXTERN_C const IID IID_IGene;
     {
         BEGIN_INTERFACE
         
+        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IGene * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
             _COM_Outptr_  void **ppvObject);
         
+        DECLSPEC_XFGVIRT(IUnknown, AddRef)
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IGene * This);
         
+        DECLSPEC_XFGVIRT(IUnknown, Release)
         ULONG ( STDMETHODCALLTYPE *Release )( 
             IGene * This);
         
@@ -181,28 +192,34 @@ EXTERN_C const IID IID_ISetPage4ThumbnailProvider;
     {
         BEGIN_INTERFACE
         
+        DECLSPEC_XFGVIRT(IUnknown, QueryInterface)
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             ISetPage4ThumbnailProvider * This,
             /* [in] */ REFIID riid,
             /* [annotation][iid_is][out] */ 
             _COM_Outptr_  void **ppvObject);
         
+        DECLSPEC_XFGVIRT(IUnknown, AddRef)
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             ISetPage4ThumbnailProvider * This);
         
+        DECLSPEC_XFGVIRT(IUnknown, Release)
         ULONG ( STDMETHODCALLTYPE *Release )( 
             ISetPage4ThumbnailProvider * This);
         
+        DECLSPEC_XFGVIRT(IThumbnailProvider, GetThumbnail)
         HRESULT ( STDMETHODCALLTYPE *GetThumbnail )( 
             ISetPage4ThumbnailProvider * This,
             /* [in] */ UINT cx,
             /* [out] */ HBITMAP *phbmp,
             /* [out] */ WTS_ALPHATYPE *pdwAlpha);
         
+        DECLSPEC_XFGVIRT(ISetPage4ThumbnailProvider, GetPageCount)
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetPageCount )( 
             ISetPage4ThumbnailProvider * This,
             /* [retval][out] */ DWORD *pcPages);
         
+        DECLSPEC_XFGVIRT(ISetPage4ThumbnailProvider, SetActivePage)
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetActivePage )( 
             ISetPage4ThumbnailProvider * This,
             /* [in] */ DWORD iPage);

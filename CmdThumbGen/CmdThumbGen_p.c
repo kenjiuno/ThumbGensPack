@@ -3,11 +3,11 @@
 /* this ALWAYS GENERATED file contains the proxy stub code */
 
 
- /* File created by MIDL compiler version 8.01.0622 */
+ /* File created by MIDL compiler version 8.01.0628 */
 /* at Tue Jan 19 12:14:07 2038
  */
 /* Compiler settings for CmdThumbGen.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0622 
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.01.0628 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -73,23 +73,89 @@ typedef struct _CmdThumbGen_MIDL_EXPR_FORMAT_STRING
     } CmdThumbGen_MIDL_EXPR_FORMAT_STRING;
 
 
-static const RPC_SYNTAX_IDENTIFIER  _RpcTransferSyntax = 
+static const RPC_SYNTAX_IDENTIFIER  _RpcTransferSyntax_2_0 = 
 {{0x8A885D04,0x1CEB,0x11C9,{0x9F,0xE8,0x08,0x00,0x2B,0x10,0x48,0x60}},{2,0}};
+
+#if defined(_CONTROL_FLOW_GUARD_XFG)
+#define XFG_TRAMPOLINES(ObjectType)\
+NDR_SHAREABLE unsigned long ObjectType ## _UserSize_XFG(unsigned long * pFlags, unsigned long Offset, void * pObject)\
+{\
+return  ObjectType ## _UserSize(pFlags, Offset, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE unsigned char * ObjectType ## _UserMarshal_XFG(unsigned long * pFlags, unsigned char * pBuffer, void * pObject)\
+{\
+return ObjectType ## _UserMarshal(pFlags, pBuffer, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE unsigned char * ObjectType ## _UserUnmarshal_XFG(unsigned long * pFlags, unsigned char * pBuffer, void * pObject)\
+{\
+return ObjectType ## _UserUnmarshal(pFlags, pBuffer, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE void ObjectType ## _UserFree_XFG(unsigned long * pFlags, void * pObject)\
+{\
+ObjectType ## _UserFree(pFlags, (ObjectType *)pObject);\
+}
+#define XFG_TRAMPOLINES64(ObjectType)\
+NDR_SHAREABLE unsigned long ObjectType ## _UserSize64_XFG(unsigned long * pFlags, unsigned long Offset, void * pObject)\
+{\
+return  ObjectType ## _UserSize64(pFlags, Offset, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE unsigned char * ObjectType ## _UserMarshal64_XFG(unsigned long * pFlags, unsigned char * pBuffer, void * pObject)\
+{\
+return ObjectType ## _UserMarshal64(pFlags, pBuffer, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE unsigned char * ObjectType ## _UserUnmarshal64_XFG(unsigned long * pFlags, unsigned char * pBuffer, void * pObject)\
+{\
+return ObjectType ## _UserUnmarshal64(pFlags, pBuffer, (ObjectType *)pObject);\
+}\
+NDR_SHAREABLE void ObjectType ## _UserFree64_XFG(unsigned long * pFlags, void * pObject)\
+{\
+ObjectType ## _UserFree64(pFlags, (ObjectType *)pObject);\
+}
+#define XFG_BIND_TRAMPOLINES(HandleType, ObjectType)\
+static void* ObjectType ## _bind_XFG(HandleType pObject)\
+{\
+return ObjectType ## _bind((ObjectType) pObject);\
+}\
+static void ObjectType ## _unbind_XFG(HandleType pObject, handle_t ServerHandle)\
+{\
+ObjectType ## _unbind((ObjectType) pObject, ServerHandle);\
+}
+#define XFG_TRAMPOLINE_FPTR(Function) Function ## _XFG
+#define XFG_TRAMPOLINE_FPTR_DEPENDENT_SYMBOL(Symbol) Symbol ## _XFG
+#else
+#define XFG_TRAMPOLINES(ObjectType)
+#define XFG_TRAMPOLINES64(ObjectType)
+#define XFG_BIND_TRAMPOLINES(HandleType, ObjectType)
+#define XFG_TRAMPOLINE_FPTR(Function) Function
+#define XFG_TRAMPOLINE_FPTR_DEPENDENT_SYMBOL(Symbol) Symbol
+#endif
 
 
 extern const CmdThumbGen_MIDL_TYPE_FORMAT_STRING CmdThumbGen__MIDL_TypeFormatString;
 extern const CmdThumbGen_MIDL_PROC_FORMAT_STRING CmdThumbGen__MIDL_ProcFormatString;
 extern const CmdThumbGen_MIDL_EXPR_FORMAT_STRING CmdThumbGen__MIDL_ExprFormatString;
 
+#ifdef __cplusplus
+namespace {
+#endif
 
 extern const MIDL_STUB_DESC Object_StubDesc;
+#ifdef __cplusplus
+}
+#endif
 
 
 extern const MIDL_SERVER_INFO IGene_ServerInfo;
 extern const MIDL_STUBLESS_PROXY_INFO IGene_ProxyInfo;
 
+#ifdef __cplusplus
+namespace {
+#endif
 
 extern const MIDL_STUB_DESC Object_StubDesc;
+#ifdef __cplusplus
+}
+#endif
 
 
 extern const MIDL_SERVER_INFO ISetPage4ThumbnailProvider_ServerInfo;
@@ -296,7 +362,7 @@ CINTERFACE_PROXY_VTABLE(6) _ISetPage4ThumbnailProviderProxyVtbl =
 };
 
 
-static const PRPC_STUB_FUNCTION ISetPage4ThumbnailProvider_table[] =
+EXTERN_C DECLSPEC_SELECTANY const PRPC_STUB_FUNCTION ISetPage4ThumbnailProvider_table[] =
 {
     STUB_FORWARDING_FUNCTION,
     NdrStubCall2,
@@ -312,6 +378,9 @@ CInterfaceStubVtbl _ISetPage4ThumbnailProviderStubVtbl =
     CStdStubBuffer_DELEGATING_METHODS
 };
 
+#ifdef __cplusplus
+namespace {
+#endif
 static const MIDL_STUB_DESC Object_StubDesc = 
     {
     0,
@@ -326,7 +395,7 @@ static const MIDL_STUB_DESC Object_StubDesc =
     1, /* -error bounds_check flag */
     0x60001, /* Ndr library version */
     0,
-    0x801026e, /* MIDL Version 8.1.622 */
+    0x8010274, /* MIDL Version 8.1.628 */
     0,
     0,
     0,  /* notify & notify_flag routine table */
@@ -335,6 +404,9 @@ static const MIDL_STUB_DESC Object_StubDesc =
     0,   /* proxy/server info */
     0
     };
+#ifdef __cplusplus
+}
+#endif
 
 const CInterfaceProxyVtbl * const _CmdThumbGen_ProxyVtblList[] = 
 {
@@ -376,7 +448,7 @@ int __stdcall _CmdThumbGen_IID_Lookup( const IID * pIID, int * pIndex )
     
 }
 
-const ExtendedProxyFileInfo CmdThumbGen_ProxyFileInfo = 
+EXTERN_C const ExtendedProxyFileInfo CmdThumbGen_ProxyFileInfo = 
 {
     (PCInterfaceProxyVtblList *) & _CmdThumbGen_ProxyVtblList,
     (PCInterfaceStubVtblList *) & _CmdThumbGen_StubVtblList,
